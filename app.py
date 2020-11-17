@@ -19,8 +19,12 @@ def todo(id=None):
     elif request.method == "POST":
         payload = request.get_json()
         todos.append({"title": payload.get("title", None), "userId": payload.get("userId", None), "completed": payload.get("completed", None)})
+        data = {"title": payload.get("title", None), "userId": payload.get("userId", None),
+                "completed": payload.get("completed", None)}
+        return jsonify(data), 200
     with open("todos.json", "w") as f:
         json.dump(todos, f, indent=4)
+
 
 
 if __name__ == '__main__':
