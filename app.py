@@ -12,7 +12,7 @@ def todo(id=None):
     if request.method == "GET":
         if len(todos) <= int(id)-1:
             id = len(todos)
-        data = todos[id]
+        data = todos[int(id)]
         res = make_response(jsonify(data))
         res.mimetype = 'application/json'
         return res
