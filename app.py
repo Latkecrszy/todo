@@ -14,7 +14,7 @@ def todo(id=None):
             id = len(todos)-1
         print(todos)
         print(id)
-        if id < 0:
+        if int(id) < 0:
             id = 0
         data = todos[int(id)]
         res = make_response(jsonify(data))
