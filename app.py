@@ -18,7 +18,7 @@ def todo(id=None):
         return res
     elif request.method == "POST":
         payload = request.get_json()
-        todos.append({"title": payload["title"], "userId": payload["userId"], "completed": payload["completed"]})
+        todos.append({"title": payload.get("title", None), "userId": payload.get("userId", None), "completed": payload.get("completed", None)})
     with open("todos.json", "w") as f:
         json.dump(todos, f, indent=4)
 
