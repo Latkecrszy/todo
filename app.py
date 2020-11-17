@@ -10,7 +10,7 @@ def todo(id=None):
     with open("todos.json") as f:
         todos = json.load(f)
     if request.method == "GET":
-        if len(todos) <= int(id):
+        if len(todos) <= int(id)-1:
             id = len(todos)
         data = todos[id]
         res = make_response(jsonify(data))
@@ -18,7 +18,7 @@ def todo(id=None):
         return res
     elif request.method == "POST":
         payload = request.get_json()
-        todos.append({"id": payload["id"], "title": payload["title"], "userId": payload["userId"], "completed": payload["completed"]})
+        todos.append({"title": payload["title"], "userId": payload["userId"], "completed": payload["completed"]})
     with open("todos.json", "w") as f:
         json.dump(todos, f, indent=4)
 
