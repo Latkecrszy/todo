@@ -11,7 +11,10 @@ def todo(id=None):
         todos = json.load(f)
     if request.method == "GET":
         if len(todos) <= int(id):
-            id = len(todos)-1
+            id = len(todos)
+        else:
+            id = int(id)
+            id -= 1
         print(todos)
         print(id)
         if int(id) < 0:
