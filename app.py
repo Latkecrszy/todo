@@ -10,8 +10,8 @@ def todo(id=None):
     with open("todos.json") as f:
         todos = json.load(f)
     if request.method == "GET":
-        if len(todos) <= int(id)-1:
-            id = len(todos)
+        if len(todos) <= int(id):
+            id = len(todos)-1
         data = todos[int(id)]
         res = make_response(jsonify(data))
         res.mimetype = 'application/json'
