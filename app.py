@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-cors = CORS(app, resources={r'/todo/*': {"origins": ["https://google.com"]}})
+cors = CORS(app, resources={r'/todo/*': {"origins": ["https://cdpn.io"]}})
 
 
 @app.route('/todo/<int:id>', methods=["GET", "PUT"])
