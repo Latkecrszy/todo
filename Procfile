@@ -1,1 +1,1 @@
-gunicorn hurbapi:app
+web: gunicorn app:app
