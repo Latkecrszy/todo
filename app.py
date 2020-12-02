@@ -2,10 +2,15 @@ from flask import Flask, make_response, jsonify, request
 import json
 import os
 
+from flask_cors import CORS
+
+
 app = Flask(__name__)
 
+cors = CORS(app, resources={r'/todo/*': {"origins": ["https://cdpn.io"]}})
 
-@app.route('/todo/<int:id>', methods=["GET"])
+
+@app.route('/todo/<int:id>', methods=["GET", "PUT"])
 @app.route('/todo/', methods=["POST"])
 def todo(id=None):
     with open("todos.json") as f:
@@ -28,6 +33,18 @@ def todo(id=None):
         with open("todos.json", "w") as f:
             json.dump(todos, f, indent=4)
         return jsonify(data), 200
+
+    elif request.method == "PUT":
+        payload = request.get_json()
+        todos[str(id)] = {"title": payload.get("title", None), "userId": payload.get("userId", None),
+                          "completed": payload.get("completed", None)}
+
+        with open("todos.json", "w") as f:
+            json.dump(todos, f, indent=4)
+
+        return jsonify({"title": payload.get("title", None), "userId": payload.get("userId", None),
+                        "completed": payload.get("completed", None)}), 200
+
 
 
 
