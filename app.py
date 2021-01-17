@@ -1,49 +1,55 @@
 from flask import Flask, make_response, jsonify, request
-import json
-import os
+import json, os, werkzeug
+import dotenv
 from flask_cors import CORS
-
-
+from flask_pymongo import PyMongo
+from pymongo import ReturnDocument
 app = Flask(__name__)
-
+app.config['MONGO_URI'] = os.environ.get('MONGO_URI', None)
 cors = CORS(app, resources={r'/todo/*': {"origins": ["https://cdpn.io"]}})
 
 
 @app.route('/todo/<int:id>', methods=["GET", "PUT"])
 @app.route('/todo/', methods=["POST"])
 def todo(id=None):
-    with open("todos.json") as f:
-        todos = json.load(f)
+    mongo = PyMongo(app)
     if request.method == "GET":
-        data = [todos[str(todo)] for todo in todos.keys() if int(todo) == id]
-        data = data[0]
+        data = mongo.db.todo.find_one({"id": str(id)})
+        data = {key: value for key, value in data.items() if key != "_id"}
         res = make_response(jsonify(data))
         res.mimetype = 'application/json'
-
         return res, 200
     elif request.method == "POST":
         payload = request.get_json()
-        intKeys = [int(key) for key in todos]
-        maxKey = max(intKeys)
-        newKey = maxKey + 1
-        todos[str(newKey)] = {"title": payload.get("title", None), "userId": payload.get("userId", None), "completed": payload.get("completed", None)}
+        id = mongo.db.counters.find_one_and_update({"_id": "todo"}, {"$inc": {"num": 1}}, return_document=ReturnDocument.AFTER)['num']
         data = {"title": payload.get("title", None), "userId": payload.get("userId", None),
-                "completed": payload.get("completed", None), "todoId": newKey}
-        with open("todos.json", "w") as f:
-            json.dump(todos, f, indent=4)
-        return jsonify(data), 200
-
+                "completed": payload.get("completed", None), "todoId": id}
+        mongo.db.todo.insert_one(data)
+        res = make_response(jsonify(data))
+        res.mimetype = 'application/json'
+        return res, 200
     elif request.method == "PUT":
         payload = request.get_json()
+        mongo.db.todo.find_one_and_replace({"todoId": str(id)}, {"title": payload.get("title", None), "userId": payload.get("userId", None),
+                "completed": payload.get("completed", None), "todoId": id})
         data = {"title": payload.get("title", None), "userId": payload.get("userId", None),
-                          "completed": payload.get("completed", None)}
-        todos[str(id)] = data
+                "completed": payload.get("completed", None), "todoId": id}
+        res = make_response(jsonify(data))
+        res.mimetype = 'application/json'
+        return res, 200
 
-        with open("todos.json", "w") as f:
-            json.dump(todos, f, indent=4)
 
-        return jsonify(data), 200
+@app.route("/mongo")
+def mongomongomongo():
+    mongo = PyMongo(app)
+    mongo.db.todo.insert_one({"test": "thing"})
+    return "nothing :)", 200
 
+
+app.register_error_handler(405, lambda e: 'Error: Method Not Allowed')
+app.register_error_handler(404, lambda e: 'Error: Not Found')
+app.register_error_handler(403, lambda e: 'Error: Forbidden')
+app.register_error_handler(400, lambda e: 'Error: Bad Request')
 
 
 
