@@ -6,6 +6,7 @@ from flask_pymongo import PyMongo
 from pymongo import ReturnDocument
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.environ.get('MONGO_URI', None)
+app.config['URI'] = os.environ.get('MONGO_URI', None)
 cors = CORS(app, resources={r'/todo/*': {"origins": ["https://cdpn.io"]}})
 
 
