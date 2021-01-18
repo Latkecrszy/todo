@@ -4,6 +4,7 @@ import dotenv
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from pymongo import ReturnDocument
+dotenv.load_dotenv()
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.environ.get('MONGO_URI', None)
 app.config['URI'] = os.environ.get('MONGO_URI', None)
